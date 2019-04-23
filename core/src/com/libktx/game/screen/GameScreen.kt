@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.libktx.game.asset.AtlasAssets
 import com.libktx.game.asset.MusicAssets
 import com.libktx.game.asset.SoundAssets
+import com.libktx.game.asset.get
 import ktx.app.KtxScreen
 import ktx.assets.invoke
 import ktx.assets.pool
@@ -36,10 +37,10 @@ class GameScreen(context: Context) : KtxScreen {
     private var lastDropTime = 0L
 
     // game assets
-    private val dropImage by lazy { AtlasAssets.Images(assets).findRegion("drop") }
-    private val bucketImage by lazy { AtlasAssets.Images(assets).findRegion("bucket") }
-    private val dropSound by lazy { SoundAssets.Drop(assets) }
-    private val rainMusic by lazy { MusicAssets.Rain(assets).apply { isLooping = true } }
+    private val dropImage = assets[AtlasAssets.Images].findRegion("drop")
+    private val bucketImage = assets[AtlasAssets.Images].findRegion("bucket")
+    private val dropSound = assets[SoundAssets.Drop]
+    private val rainMusic = assets[MusicAssets.Rain].apply { isLooping = true }
 
     override fun show() {
         rainMusic.play()

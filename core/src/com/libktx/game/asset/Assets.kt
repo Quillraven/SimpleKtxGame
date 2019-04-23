@@ -4,32 +4,31 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import ktx.assets.getAsset
 import ktx.assets.load
 
 enum class AtlasAssets {
     Images;
 
-    private val path = "images/${name.toLowerCase()}.atlas"
-
-    fun load(assets: AssetManager) = assets.load<TextureAtlas>(path)
-    operator fun invoke(assets: AssetManager) = assets.getAsset<TextureAtlas>(path)
+    internal val path = "images/${name.toLowerCase()}.atlas"
 }
+
+fun AssetManager.load(asset: AtlasAssets) = load<TextureAtlas>(asset.path)
+operator fun AssetManager.get(asset: AtlasAssets): TextureAtlas = get(asset.path)
 
 enum class SoundAssets {
     Drop;
 
-    private val path = "sounds/${name.toLowerCase()}.wav"
-
-    fun load(assets: AssetManager) = assets.load<Sound>(path)
-    operator fun invoke(assets: AssetManager) = assets.getAsset<Sound>(path)
+    internal val path = "sounds/${name.toLowerCase()}.wav"
 }
+
+fun AssetManager.load(asset: SoundAssets) = load<Sound>(asset.path)
+operator fun AssetManager.get(asset: SoundAssets): Sound = get(asset.path)
 
 enum class MusicAssets {
     Rain;
 
-    private val path = "music/${name.toLowerCase()}.mp3"
-
-    fun load(assets: AssetManager) = assets.load<Music>(path)
-    operator fun invoke(assets: AssetManager) = assets.getAsset<Music>(path)
+    internal val path = "music/${name.toLowerCase()}.mp3"
 }
+
+fun AssetManager.load(asset: MusicAssets) = load<Music>(asset.path)
+operator fun AssetManager.get(asset: MusicAssets): Music = get(asset.path)

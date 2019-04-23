@@ -6,8 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import com.libktx.game.screen.GameScreen
-import com.libktx.game.screen.MenuScreen
+import com.libktx.game.screen.LoadingScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.inject.Context
@@ -32,12 +31,10 @@ class Game : KtxGame<KtxScreen>() {
             bindSingleton(this@Game)
         }
 
-        // create screens
+        // create LoadingScreen to load assets of game
         // pass context to get access to relevant instances
-        addScreen(MenuScreen(context))
-        addScreen(GameScreen(context))
-        // start with menu screen
-        setScreen<MenuScreen>()
+        addScreen(LoadingScreen(context))
+        setScreen<LoadingScreen>()
 
         super.create()
     }
