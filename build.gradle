@@ -10,14 +10,13 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
     apply plugin: "idea"
 
     version = '1.0'
@@ -60,12 +59,12 @@ project(":core") {
     dependencies {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        compile "io.github.libktx:ktx-app:$ktxVersion"
-        compile "io.github.libktx:ktx-assets:$ktxVersion"
-        compile "io.github.libktx:ktx-collections:$ktxVersion"
-        compile "io.github.libktx:ktx-graphics:$ktxVersion"
-        compile "io.github.libktx:ktx-log:$ktxVersion"
-        compile "io.github.libktx:ktx-inject:$ktxVersion"
+        api "io.github.libktx:ktx-app:$ktxVersion"
+        api "io.github.libktx:ktx-assets:$ktxVersion"
+        api "io.github.libktx:ktx-collections:$ktxVersion"
+        api "io.github.libktx:ktx-graphics:$ktxVersion"
+        api "io.github.libktx:ktx-log:$ktxVersion"
+        api "io.github.libktx:ktx-inject:$ktxVersion"
     }
 }
 
@@ -85,8 +84,4 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     }
-}
-
-tasks.eclipse.doLast {
-    delete ".project"
 }
