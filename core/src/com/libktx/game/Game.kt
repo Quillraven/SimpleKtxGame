@@ -29,13 +29,13 @@ class Game : KtxGame<KtxScreen>() {
             bindSingleton(BitmapFont())
             bindSingleton(AssetManager())
             bindSingleton(this@Game)
+
+            // create LoadingScreen that will be responsible to load all assets of the game
+            addScreen(LoadingScreen(inject(), inject<Viewport>().camera, inject(), inject(), inject()))
         }
 
-        // create LoadingScreen to load assets of game
-        // pass context to get access to relevant instances
-        addScreen(LoadingScreen(context))
+        // first screen is our LoadingScreen
         setScreen<LoadingScreen>()
-
         super.create()
     }
 

@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.TimeUtils
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.libktx.game.asset.AtlasAssets
 import com.libktx.game.asset.MusicAssets
 import com.libktx.game.asset.SoundAssets
@@ -19,15 +18,12 @@ import ktx.assets.invoke
 import ktx.assets.pool
 import ktx.collections.gdxListOf
 import ktx.graphics.use
-import ktx.inject.Context
 import ktx.log.logger
 
-class GameScreen(context: Context) : KtxScreen {
+class GameScreen(private val batch: Batch,
+                 private val camera: Camera,
+                 assets: AssetManager) : KtxScreen {
     private val log = logger<GameScreen>()
-
-    private val batch: Batch = context.inject()
-    private val camera: Camera = context.inject<Viewport>().camera
-    private val assets: AssetManager = context.inject()
 
     private val touchPos = Vector3()
     private val bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
