@@ -6,6 +6,11 @@ sourceSets.main.kotlin.srcDirs = [ "src/" ]
 project.ext.mainClassName = "com.libktx.game.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../android/assets");
 
+dependencies {
+    runtimeClasspath files("../core/build/classes/kotlin/main")
+    runtimeClasspath files("build/classes/kotlin/main")
+}
+
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
     classpath = sourceSets.main.runtimeClasspath
