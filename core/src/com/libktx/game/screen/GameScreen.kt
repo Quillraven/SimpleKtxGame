@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.TimeUtils
 import com.libktx.game.Game
 import ktx.app.KtxScreen
+import ktx.collections.iterate
+import ktx.graphics.use
 
 class GameScreen(val game: Game) : KtxScreen {
     // load the images for the droplet & bucket, 64x64 pixels each
@@ -46,13 +48,11 @@ class GameScreen(val game: Game) : KtxScreen {
         game.batch.projectionMatrix = camera.combined
 
         // begin a new batch and draw the bucket and all drops
-        game.batch.begin()
-        game.font.draw(game.batch, "Drops Collected: $dropsGathered", 0f, 480f)
-        game.batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height)
-        for (raindrop in raindrops) {
-            game.batch.draw(dropImage, raindrop.x, raindrop.y)
+        game.batch.use { batch ->
+            game.font.draw(batch, "Drops Collected: $dropsGathered", 0f, 480f)
+            batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height)
+            raindrops.forEach { raindrop -> batch.draw(dropImage, raindrop.x, raindrop.y) }
         }
-        game.batch.end()
 
         // process user input
         if (Gdx.input.isTouched) {
@@ -78,17 +78,15 @@ class GameScreen(val game: Game) : KtxScreen {
         // move the raindrops, remove any that are beneath the bottom edge of the
         //    screen or that hit the bucket.  In the latter case, play back a sound
         //    effect also
-        val iter = raindrops.iterator()
-        while (iter.hasNext()) {
-            val raindrop = iter.next()
+        raindrops.iterate { raindrop, iterator ->
             raindrop.y -= 200 * delta
-            if (raindrop.y + 64 < 0)
-                iter.remove()
-
+            if (raindrop.y + 64 < 0) {
+                iterator.remove()
+            }
             if (raindrop.overlaps(bucket)) {
                 dropsGathered++
                 dropSound.play()
-                iter.remove()
+                iterator.remove()
             }
         }
     }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.libktx.game.Game
 import ktx.app.KtxScreen
+import ktx.graphics.use
 
 class MainMenuScreen(val game: Game) : KtxScreen {
     private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
@@ -12,10 +13,10 @@ class MainMenuScreen(val game: Game) : KtxScreen {
         camera.update()
         game.batch.projectionMatrix = camera.combined
 
-        game.batch.begin()
-        game.font.draw(game.batch, "Welcome to Drop!!! ", 100f, 150f)
-        game.font.draw(game.batch, "Tap anywhere to begin!", 100f, 100f)
-        game.batch.end()
+        game.batch.use {
+            game.font.draw(it, "Welcome to Drop!!! ", 100f, 150f)
+            game.font.draw(it, "Tap anywhere to begin!", 100f, 100f)
+        }
 
         if (Gdx.input.isTouched) {
             game.addScreen(GameScreen(game))
