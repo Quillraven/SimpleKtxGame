@@ -6,7 +6,7 @@ import com.libktx.game.Game
 import ktx.app.KtxScreen
 
 class MainMenuScreen(val game: Game) : KtxScreen {
-    private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
+    private val camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
 
     override fun render(delta: Float) {
         camera.update()

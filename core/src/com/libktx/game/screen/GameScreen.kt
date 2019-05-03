@@ -14,24 +14,24 @@ import ktx.app.KtxScreen
 
 class GameScreen(val game: Game) : KtxScreen {
     // load the images for the droplet & bucket, 64x64 pixels each
-    private var dropImage = Texture(Gdx.files.internal("images/drop.png"))
-    private var bucketImage = Texture(Gdx.files.internal("images/bucket.png"))
+    private val dropImage = Texture(Gdx.files.internal("images/drop.png"))
+    private val bucketImage = Texture(Gdx.files.internal("images/bucket.png"))
     // load the drop sound effect and the rain background music
-    private var dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"))
-    private var rainMusic = Gdx.audio.newMusic(Gdx.files.internal("music/rain.mp3")).apply { isLooping = true }
+    private val dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"))
+    private val rainMusic = Gdx.audio.newMusic(Gdx.files.internal("music/rain.mp3")).apply { isLooping = true }
     // The camera ensures we can render using our target resolution of 800x480
     //    pixels no matter what the screen resolution is.
-    private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
+    private val camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
     // create a Rectangle to logically represent the bucket
     // center the bucket horizontally
     // bottom left bucket corner is 20px above
-    private var bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
+    private val bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
     // create the touchPos to store mouse click position
-    private var touchPos = Vector3()
+    private val touchPos = Vector3()
     // create the raindrops array and spawn the first raindrop
-    private var raindrops = Array<Rectangle>() // gdx, not Kotlin Array
-    private var lastDropTime: Long = 0L
-    private var dropsGathered: Int = 0
+    private val raindrops = Array<Rectangle>() // gdx, not Kotlin Array
+    private var lastDropTime = 0L
+    private var dropsGathered = 0
 
     private fun spawnRaindrop() {
         raindrops.add(Rectangle(MathUtils.random(0f, 800f - 64f), 480f, 64f, 64f))
