@@ -14,6 +14,8 @@ import com.libktx.game.assets.SoundAssets
 import com.libktx.game.assets.TextureAtlasAssets
 import com.libktx.game.assets.get
 import ktx.app.KtxScreen
+import ktx.assets.invoke
+import ktx.assets.pool
 import ktx.collections.iterate
 import ktx.graphics.use
 import ktx.log.logger
@@ -35,12 +37,13 @@ class GameScreen(val game: Game) : KtxScreen {
     // create the touchPos to store mouse click position
     private var touchPos = Vector3()
     // create the raindrops array and spawn the first raindrop
-    private var raindrops = Array<Rectangle>() // gdx, not Kotlin Array
+    private val raindropsPool = pool { Rectangle() } // pool to reuse raindrop rectangles
+    private var activeRaindrops = Array<Rectangle>() // gdx, not Kotlin Array
     private var lastDropTime: Long = 0L
     private var dropsGathered: Int = 0
 
     private fun spawnRaindrop() {
-        raindrops.add(Rectangle(MathUtils.random(0f, 800f - 64f), 480f, 64f, 64f))
+        activeRaindrops.add(raindropsPool().set(MathUtils.random(0f, 800f - 64f), 480f, 64f, 64f))
         lastDropTime = TimeUtils.nanoTime()
     }
 
@@ -55,7 +58,7 @@ class GameScreen(val game: Game) : KtxScreen {
         game.batch.use { batch ->
             game.font.draw(batch, "Drops Collected: $dropsGathered", 0f, 480f)
             batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height)
-            raindrops.forEach { raindrop -> batch.draw(dropImage, raindrop.x, raindrop.y) }
+            activeRaindrops.forEach { raindrop -> batch.draw(dropImage, raindrop.x, raindrop.y) }
         }
 
         // process user input
@@ -82,16 +85,19 @@ class GameScreen(val game: Game) : KtxScreen {
         // move the raindrops, remove any that are beneath the bottom edge of the
         //    screen or that hit the bucket.  In the latter case, play back a sound
         //    effect also
-        raindrops.iterate { raindrop, iterator ->
+        activeRaindrops.iterate { raindrop, iterator ->
             raindrop.y -= 200 * delta
             if (raindrop.y + 64 < 0) {
                 iterator.remove()
-                log.debug { "Missed a raindrop!" }
+                raindropsPool(raindrop)
+                log.debug { "Missed a raindrop! Pool free objects: ${raindropsPool.free}" }
             }
             if (raindrop.overlaps(bucket)) {
                 dropsGathered++
                 dropSound.play()
                 iterator.remove()
+                raindropsPool(raindrop)
+                log.debug { "Pool free objects: ${raindropsPool.free}" }
             }
         }
     }
