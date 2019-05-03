@@ -1,58 +1,43 @@
 package com.libktx.game
 
+import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.utils.viewport.FitViewport
-import com.badlogic.gdx.utils.viewport.Viewport
+import com.libktx.game.screen.GameScreen
 import com.libktx.game.screen.LoadingScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.inject.Context
 import ktx.log.logger
 
-class Game : KtxGame<KtxScreen>() {
-    private val log = logger<Game>()
+private val log = logger<Game>()
 
+class Game : KtxGame<KtxScreen>() {
     private val context = Context()
-    private val viewport = FitViewport(800f, 480f)
-    private val batch by lazy { SpriteBatch() }
 
     override fun create() {
-        // creating the game context
-        // context contains all instances that are relevant for the entire game
-        // Note: context.dispose() will also dispose all instances that extended 'Disposable' interface
         context.register {
-            bindSingleton<Batch>(batch)
-            bindSingleton<Viewport>(viewport)
+            bindSingleton(this@Game)
+            bindSingleton<Batch>(SpriteBatch())
             bindSingleton(BitmapFont())
             bindSingleton(AssetManager())
-            bindSingleton(this@Game)
+            // The camera ensures we can render using our target resolution of 800x480
+            //    pixels no matter what the screen resolution is.
+            bindSingleton(OrthographicCamera().apply { setToOrtho(false, 800f, 480f) })
+            bindSingleton(PooledEngine())
 
-            // create LoadingScreen that will be responsible to load all assets of the game
-            addScreen(LoadingScreen(inject(), inject<Viewport>().camera, inject(), inject(), inject()))
+            addScreen(LoadingScreen(inject(), inject(), inject(), inject(), inject()))
+            addScreen(GameScreen(inject(), inject(), inject(), inject(), inject()))
         }
-
-        // first screen is our LoadingScreen
         setScreen<LoadingScreen>()
         super.create()
     }
 
-    override fun render() {
-        // always update camera and set batch projection matrix as this is needed for all screens
-        viewport.apply()
-        batch.projectionMatrix = viewport.camera.combined
-        super.render()
-    }
-
-    override fun resize(width: Int, height: Int) {
-        log.debug { "Resizing to $width x $height" }
-        viewport.update(width, height, true)
-        super.resize(width, height)
-    }
-
     override fun dispose() {
+        log.debug { "Entities in engine: ${context.inject<PooledEngine>().entities.size()}" }
         context.dispose()
         super.dispose()
     }
