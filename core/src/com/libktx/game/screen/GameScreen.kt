@@ -3,13 +3,16 @@ package com.libktx.game.screen
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.TimeUtils
 import com.libktx.game.Game
+import com.libktx.game.assets.MusicAssets
+import com.libktx.game.assets.SoundAssets
+import com.libktx.game.assets.TextureAtlasAssets
+import com.libktx.game.assets.get
 import ktx.app.KtxScreen
 import ktx.collections.iterate
 import ktx.graphics.use
@@ -18,12 +21,10 @@ import ktx.log.logger
 private val log = logger<GameScreen>()
 
 class GameScreen(val game: Game) : KtxScreen {
-    // load the images for the droplet & bucket, 64x64 pixels each
-    private var dropImage = Texture(Gdx.files.internal("images/drop.png"))
-    private var bucketImage = Texture(Gdx.files.internal("images/bucket.png"))
-    // load the drop sound effect and the rain background music
-    private var dropSound = Gdx.audio.newSound(Gdx.files.internal("sounds/drop.wav"))
-    private var rainMusic = Gdx.audio.newMusic(Gdx.files.internal("music/rain.mp3")).apply { isLooping = true }
+    private var dropImage = game.assets[TextureAtlasAssets.Game].findRegion("drop")
+    private var bucketImage = game.assets[TextureAtlasAssets.Game].findRegion("bucket")
+    private var dropSound = game.assets[SoundAssets.Drop]
+    private var rainMusic = game.assets[MusicAssets.Rain].apply { isLooping = true }
     // The camera ensures we can render using our target resolution of 800x480
     //    pixels no matter what the screen resolution is.
     private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
@@ -99,13 +100,5 @@ class GameScreen(val game: Game) : KtxScreen {
         // start the playback of the background music when the screen is shown
         rainMusic.play()
         spawnRaindrop()
-    }
-
-    override fun dispose() {
-        log.debug { "Disposing ${this.javaClass.simpleName}" }
-        dropImage.dispose()
-        bucketImage.dispose()
-        dropSound.dispose()
-        rainMusic.dispose()
     }
 }
