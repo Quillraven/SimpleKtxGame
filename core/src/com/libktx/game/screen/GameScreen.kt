@@ -2,13 +2,15 @@ package com.libktx.game.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.TimeUtils
-import com.libktx.game.Game
 import com.libktx.game.assets.MusicAssets
 import com.libktx.game.assets.SoundAssets
 import com.libktx.game.assets.TextureAtlasAssets
@@ -22,14 +24,14 @@ import ktx.log.logger
 
 private val log = logger<GameScreen>()
 
-class GameScreen(val game: Game) : KtxScreen {
-    private val dropImage = game.assets[TextureAtlasAssets.Game].findRegion("drop")
-    private val bucketImage = game.assets[TextureAtlasAssets.Game].findRegion("bucket")
-    private val dropSound = game.assets[SoundAssets.Drop]
-    private val rainMusic = game.assets[MusicAssets.Rain].apply { isLooping = true }
-    // The camera ensures we can render using our target resolution of 800x480
-    //    pixels no matter what the screen resolution is.
-    private val camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
+class GameScreen(private val batch: Batch,
+                 private val font: BitmapFont,
+                 assets: AssetManager,
+                 private val camera: OrthographicCamera) : KtxScreen {
+    private val dropImage = assets[TextureAtlasAssets.Game].findRegion("drop")
+    private val bucketImage = assets[TextureAtlasAssets.Game].findRegion("bucket")
+    private val dropSound = assets[SoundAssets.Drop]
+    private val rainMusic = assets[MusicAssets.Rain].apply { isLooping = true }
     // create a Rectangle to logically represent the bucket
     // center the bucket horizontally
     // bottom left bucket corner is 20px above
@@ -52,11 +54,11 @@ class GameScreen(val game: Game) : KtxScreen {
         camera.update()
 
         // tell the SpriteBatch to render in the coordinate system specified by the camera.
-        game.batch.projectionMatrix = camera.combined
+        batch.projectionMatrix = camera.combined
 
         // begin a new batch and draw the bucket and all drops
-        game.batch.use { batch ->
-            game.font.draw(batch, "Drops Collected: $dropsGathered", 0f, 480f)
+        batch.use { batch ->
+            font.draw(batch, "Drops Collected: $dropsGathered", 0f, 480f)
             batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height)
             activeRaindrops.forEach { raindrop -> batch.draw(dropImage, raindrop.x, raindrop.y) }
         }
