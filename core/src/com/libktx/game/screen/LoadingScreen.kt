@@ -41,10 +41,9 @@ class LoadingScreen(private val game: Game,
         }
 
         if (Gdx.input.isTouched && assets.isFinished) {
-            game.addScreen(GameScreen(batch, font, assets, camera))
-            game.setScreen<GameScreen>()
             game.removeScreen<LoadingScreen>()
             dispose()
+            game.setScreen<GameScreen>()
         }
     }
 }

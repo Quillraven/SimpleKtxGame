@@ -1,112 +1,75 @@
 package com.libktx.game.screen
 
+import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.utils.Array
-import com.badlogic.gdx.utils.TimeUtils
 import com.libktx.game.assets.MusicAssets
-import com.libktx.game.assets.SoundAssets
 import com.libktx.game.assets.TextureAtlasAssets
 import com.libktx.game.assets.get
+import com.libktx.game.ecs.component.BucketComponent
+import com.libktx.game.ecs.component.MoveComponent
+import com.libktx.game.ecs.component.RenderComponent
+import com.libktx.game.ecs.component.TransformComponent
+import com.libktx.game.ecs.system.CollisionSystem
+import com.libktx.game.ecs.system.MoveSystem
+import com.libktx.game.ecs.system.RenderSystem
+import com.libktx.game.ecs.system.SpawnSystem
 import ktx.app.KtxScreen
-import ktx.assets.invoke
-import ktx.assets.pool
-import ktx.collections.iterate
-import ktx.graphics.use
-import ktx.log.logger
-
-private val log = logger<GameScreen>()
+import ktx.ashley.entity
+import ktx.ashley.get
 
 class GameScreen(private val batch: Batch,
                  private val font: BitmapFont,
-                 assets: AssetManager,
-                 private val camera: OrthographicCamera) : KtxScreen {
-    private val dropImage = assets[TextureAtlasAssets.Game].findRegion("drop")
-    private val bucketImage = assets[TextureAtlasAssets.Game].findRegion("bucket")
-    private val dropSound = assets[SoundAssets.Drop]
-    private val rainMusic = assets[MusicAssets.Rain].apply { isLooping = true }
-    // create a Rectangle to logically represent the bucket
-    // center the bucket horizontally
-    // bottom left bucket corner is 20px above
-    private val bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
-    // create the touchPos to store mouse click position
-    private val touchPos = Vector3()
-    // create the raindrops array and spawn the first raindrop
-    private val raindropsPool = pool { Rectangle() } // pool to reuse raindrop rectangles
-    private val activeRaindrops = Array<Rectangle>() // gdx, not Kotlin Array
-    private var lastDropTime = 0L
-    private var dropsGathered = 0
-
-    private fun spawnRaindrop() {
-        activeRaindrops.add(raindropsPool().set(MathUtils.random(0f, 800f - 64f), 480f, 64f, 64f))
-        lastDropTime = TimeUtils.nanoTime()
+                 private val assets: AssetManager,
+                 private val camera: OrthographicCamera,
+                 private val engine: PooledEngine) : KtxScreen {
+    // create bucket entity
+    private val bucket = engine.entity {
+        with<BucketComponent>()
+        with<TransformComponent> { bounds.set(800f / 2f - 64f / 2f, 20f, 64f, 64f) }
+        with<MoveComponent>()
+        with<RenderComponent>()
     }
 
+    // create the touchPos to store mouse click position
+    private val touchPos = Vector3()
+
     override fun render(delta: Float) {
-        // generally good practice to update the camera's matrices once per frame
-        camera.update()
-
-        // tell the SpriteBatch to render in the coordinate system specified by the camera.
-        batch.projectionMatrix = camera.combined
-
-        // begin a new batch and draw the bucket and all drops
-        batch.use { batch ->
-            font.draw(batch, "Drops Collected: $dropsGathered", 0f, 480f)
-            batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height)
-            activeRaindrops.forEach { raindrop -> batch.draw(dropImage, raindrop.x, raindrop.y) }
-        }
-
         // process user input
         if (Gdx.input.isTouched) {
             touchPos.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f)
             camera.unproject(touchPos)
-            bucket.x = touchPos.x - 64f / 2f
+            bucket[TransformComponent.mapper]?.let { transform -> transform.bounds.x = touchPos.x - 64f / 2f }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            bucket.x -= 200 * delta
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            bucket.x += 200 * delta
-        }
-
-        // make sure the bucket stays within the screen bounds
-        bucket.x = MathUtils.clamp(bucket.x, 0f, 800f - 64f)
-
-        // check if we need to create a new raindrop
-        if (TimeUtils.nanoTime() - lastDropTime > 1_000_000_000L) {
-            spawnRaindrop()
+        when {
+            Gdx.input.isKeyPressed(Input.Keys.LEFT) -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = -200f }
+            Gdx.input.isKeyPressed(Input.Keys.RIGHT) -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = 200f }
+            else -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = 0f }
         }
 
-        // move the raindrops, remove any that are beneath the bottom edge of the
-        //    screen or that hit the bucket.  In the latter case, play back a sound
-        //    effect also
-        activeRaindrops.iterate { raindrop, iterator ->
-            raindrop.y -= 200 * delta
-            if (raindrop.y + 64 < 0) {
-                iterator.remove()
-                raindropsPool(raindrop)
-                log.debug { "Missed a raindrop! Pool free objects: ${raindropsPool.free}" }
-            }
-            if (raindrop.overlaps(bucket)) {
-                dropsGathered++
-                dropSound.play()
-                iterator.remove()
-                raindropsPool(raindrop)
-                log.debug { "Pool free objects: ${raindropsPool.free}" }
-            }
-        }
+        // everything is now done withing our entity engine --> update it every frame
+        engine.update(delta)
     }
 
     override fun show() {
         // start the playback of the background music when the screen is shown
-        rainMusic.play()
-        spawnRaindrop()
+        assets[MusicAssets.Rain].apply { isLooping = true }.play()
+        // set bucket sprite
+        bucket[RenderComponent.mapper]?.sprite?.setRegion(assets[TextureAtlasAssets.Game].findRegion("bucket"))
+        // initialize entity engine
+        engine.apply {
+            // add systems
+            addSystem(SpawnSystem(assets))
+            addSystem(MoveSystem())
+            addSystem(RenderSystem(bucket, batch, font, camera))
+            // add CollisionSystem last as it removes entities and this should always
+            // happen at the end of an engine update frame
+            addSystem(CollisionSystem(bucket, assets))
+        }
     }
 }
