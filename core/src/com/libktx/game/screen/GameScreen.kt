@@ -23,24 +23,24 @@ import ktx.log.logger
 private val log = logger<GameScreen>()
 
 class GameScreen(val game: Game) : KtxScreen {
-    private var dropImage = game.assets[TextureAtlasAssets.Game].findRegion("drop")
-    private var bucketImage = game.assets[TextureAtlasAssets.Game].findRegion("bucket")
-    private var dropSound = game.assets[SoundAssets.Drop]
-    private var rainMusic = game.assets[MusicAssets.Rain].apply { isLooping = true }
+    private val dropImage = game.assets[TextureAtlasAssets.Game].findRegion("drop")
+    private val bucketImage = game.assets[TextureAtlasAssets.Game].findRegion("bucket")
+    private val dropSound = game.assets[SoundAssets.Drop]
+    private val rainMusic = game.assets[MusicAssets.Rain].apply { isLooping = true }
     // The camera ensures we can render using our target resolution of 800x480
     //    pixels no matter what the screen resolution is.
-    private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
+    private val camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
     // create a Rectangle to logically represent the bucket
     // center the bucket horizontally
     // bottom left bucket corner is 20px above
-    private var bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
+    private val bucket = Rectangle(800f / 2f - 64f / 2f, 20f, 64f, 64f)
     // create the touchPos to store mouse click position
-    private var touchPos = Vector3()
+    private val touchPos = Vector3()
     // create the raindrops array and spawn the first raindrop
     private val raindropsPool = pool { Rectangle() } // pool to reuse raindrop rectangles
-    private var activeRaindrops = Array<Rectangle>() // gdx, not Kotlin Array
-    private var lastDropTime: Long = 0L
-    private var dropsGathered: Int = 0
+    private val activeRaindrops = Array<Rectangle>() // gdx, not Kotlin Array
+    private var lastDropTime = 0L
+    private var dropsGathered = 0
 
     private fun spawnRaindrop() {
         activeRaindrops.add(raindropsPool().set(MathUtils.random(0f, 800f - 64f), 480f, 64f, 64f))

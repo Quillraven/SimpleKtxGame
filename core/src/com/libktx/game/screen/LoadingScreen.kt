@@ -11,7 +11,7 @@ import ktx.app.KtxScreen
 import ktx.graphics.use
 
 class LoadingScreen(val game: Game) : KtxScreen {
-    private var camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
+    private val camera = OrthographicCamera().apply { setToOrtho(false, 800f, 480f) }
 
     override fun show() {
         MusicAssets.values().forEach { game.assets.load(it) }
