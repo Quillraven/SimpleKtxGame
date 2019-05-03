@@ -13,6 +13,9 @@ import com.libktx.game.Game
 import ktx.app.KtxScreen
 import ktx.collections.iterate
 import ktx.graphics.use
+import ktx.log.logger
+
+private val log = logger<GameScreen>()
 
 class GameScreen(val game: Game) : KtxScreen {
     // load the images for the droplet & bucket, 64x64 pixels each
@@ -82,6 +85,7 @@ class GameScreen(val game: Game) : KtxScreen {
             raindrop.y -= 200 * delta
             if (raindrop.y + 64 < 0) {
                 iterator.remove()
+                log.debug { "Missed a raindrop!" }
             }
             if (raindrop.overlaps(bucket)) {
                 dropsGathered++
@@ -98,6 +102,7 @@ class GameScreen(val game: Game) : KtxScreen {
     }
 
     override fun dispose() {
+        log.debug { "Disposing ${this.javaClass.simpleName}" }
         dropImage.dispose()
         bucketImage.dispose()
         dropSound.dispose()
