@@ -3,23 +3,26 @@ package com.libktx.game
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.libktx.game.screen.MainMenuScreen
-import ktx.app.KtxGame
-import ktx.app.KtxScreen
 
-class Game : KtxGame<KtxScreen>() {
-    val batch by lazy { SpriteBatch() }
-    // use LibGDX's default Arial font
-    val font by lazy { BitmapFont() }
+class Game : com.badlogic.gdx.Game() {
+    public lateinit var batch: SpriteBatch
+    public lateinit var font: BitmapFont
 
     override fun create() {
-        addScreen(MainMenuScreen(this))
-        setScreen<MainMenuScreen>()
-        super.create()
+        batch = SpriteBatch()
+        // use LibGDX's default Arial font
+        font = BitmapFont()
+        this.setScreen(MainMenuScreen(this))
+    }
+
+    override fun render() {
+        super.render()  // important!
     }
 
     override fun dispose() {
+        this.getScreen().dispose()
+
         batch.dispose()
         font.dispose()
-        super.dispose()
     }
 }
