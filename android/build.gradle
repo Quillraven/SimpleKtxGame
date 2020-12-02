@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "28.0.3"
-    compileSdkVersion 28
+    buildToolsVersion "30.0.2"
+    compileSdkVersion 30
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -18,8 +18,8 @@ android {
     }
     defaultConfig {
         applicationId "com.libktx.game"
-        minSdkVersion 9
-        targetSdkVersion 28
+        minSdkVersion 14
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
     }
@@ -43,7 +43,7 @@ task copyAndroidNatives {
         file("libs/x86_64/").mkdirs()
         file("libs/x86/").mkdirs()
 
-        configurations.natives.files.each { jar ->
+        configurations.natives.copy().files.each { jar ->
             def outputDir = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
             if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
@@ -87,27 +87,4 @@ task run(type: Exec) {
 
     def adb = path + "/platform-tools/adb"
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.libktx.game/com.libktx.game.AndroidLauncher'
-}
-
-// sets up the Android Idea project, using the old Ant based build.
-idea {
-    module {
-        sourceDirs += file("src");
-        scopes = [ COMPILE: [plus:[project.configurations.compile]]]        
-
-        iml {
-            withXml {
-                def node = it.asNode()
-                def builder = NodeBuilder.newInstance();
-                builder.current = node;
-                builder.component(name: "FacetManager") {
-                    facet(type: "android", name: "Android") {
-                        configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value:"true")
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
