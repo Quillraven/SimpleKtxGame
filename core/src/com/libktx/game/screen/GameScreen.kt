@@ -20,6 +20,7 @@ import ktx.assets.invoke
 import ktx.assets.pool
 import ktx.collections.iterate
 import ktx.graphics.use
+import ktx.log.debug
 import ktx.log.logger
 
 private val log = logger<GameScreen>()
