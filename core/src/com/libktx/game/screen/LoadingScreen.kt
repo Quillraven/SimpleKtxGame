@@ -13,11 +13,13 @@ import com.libktx.game.assets.load
 import ktx.app.KtxScreen
 import ktx.graphics.use
 
-class LoadingScreen(private val game: Game,
-                    private val batch: Batch,
-                    private val font: BitmapFont,
-                    private val assets: AssetManager,
-                    private val camera: OrthographicCamera) : KtxScreen {
+class LoadingScreen(
+    private val game: Game,
+    private val batch: Batch,
+    private val font: BitmapFont,
+    private val assets: AssetManager,
+    private val camera: OrthographicCamera
+) : KtxScreen {
     override fun show() {
         MusicAssets.values().forEach { assets.load(it) }
         SoundAssets.values().forEach { assets.load(it) }

@@ -11,6 +11,8 @@ import com.libktx.game.screen.LoadingScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.inject.Context
+import ktx.inject.register
+import ktx.log.debug
 import ktx.log.logger
 
 private val log = logger<Game>()
@@ -20,7 +22,6 @@ class Game : KtxGame<KtxScreen>() {
 
     override fun create() {
         context.register {
-            bindSingleton(this@Game)
             bindSingleton<Batch>(SpriteBatch())
             bindSingleton(BitmapFont())
             bindSingleton(AssetManager())
@@ -29,7 +30,7 @@ class Game : KtxGame<KtxScreen>() {
             bindSingleton(OrthographicCamera().apply { setToOrtho(false, 800f, 480f) })
             bindSingleton(PooledEngine())
 
-            addScreen(LoadingScreen(inject(), inject(), inject(), inject(), inject()))
+            addScreen(LoadingScreen(this@Game, inject(), inject(), inject(), inject()))
             addScreen(GameScreen(inject(), inject(), inject(), inject(), inject()))
         }
         setScreen<LoadingScreen>()

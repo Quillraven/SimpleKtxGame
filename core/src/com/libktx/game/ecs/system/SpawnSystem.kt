@@ -11,6 +11,7 @@ import com.libktx.game.ecs.component.MoveComponent
 import com.libktx.game.ecs.component.RenderComponent
 import com.libktx.game.ecs.component.TransformComponent
 import ktx.ashley.entity
+import ktx.ashley.with
 
 class SpawnSystem(assets: AssetManager) : IntervalSystem(1f) {
     private val dropRegion = assets[TextureAtlasAssets.Game].findRegion("drop")
