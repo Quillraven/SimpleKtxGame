@@ -12,13 +12,15 @@ import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.graphics.use
 
-class RenderSystem(bucket: Entity,
-                   private val batch: Batch,
-                   private val font: BitmapFont,
-                   private val camera: OrthographicCamera) : SortedIteratingSystem(
-        allOf(TransformComponent::class, RenderComponent::class).get(),
-        // compareBy is used to render entities by their z-index (=bucket is drawn in the background; raindrops are drawn in the foreground)
-        compareBy { entity: Entity -> entity[RenderComponent.mapper]?.z }) {
+class RenderSystem(
+    bucket: Entity,
+    private val batch: Batch,
+    private val font: BitmapFont,
+    private val camera: OrthographicCamera
+) : SortedIteratingSystem(
+    allOf(TransformComponent::class, RenderComponent::class).get(),
+    // compareBy is used to render entities by their z-index (=bucket is drawn in the background; raindrops are drawn in the foreground)
+    compareBy { entity: Entity -> entity[RenderComponent.mapper]?.z }) {
     private val bucketCmp = bucket[BucketComponent.mapper]!!
 
     override fun update(deltaTime: Float) {

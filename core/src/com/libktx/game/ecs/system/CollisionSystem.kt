@@ -11,7 +11,8 @@ import com.libktx.game.ecs.component.TransformComponent
 import ktx.ashley.allOf
 import ktx.ashley.get
 
-class CollisionSystem(bucket: Entity, assets: AssetManager) : IteratingSystem(allOf(TransformComponent::class, CollisionComponent::class).get()) {
+class CollisionSystem(bucket: Entity, assets: AssetManager) :
+    IteratingSystem(allOf(TransformComponent::class, CollisionComponent::class).get()) {
     private val dropSound = assets[SoundAssets.Drop]
     private val bucketBounds = bucket[TransformComponent.mapper]!!.bounds
     private val bucketCmp = bucket[BucketComponent.mapper]!!

@@ -22,12 +22,15 @@ import com.libktx.game.ecs.system.SpawnSystem
 import ktx.app.KtxScreen
 import ktx.ashley.entity
 import ktx.ashley.get
+import ktx.ashley.with
 
-class GameScreen(private val batch: Batch,
-                 private val font: BitmapFont,
-                 private val assets: AssetManager,
-                 private val camera: OrthographicCamera,
-                 private val engine: PooledEngine) : KtxScreen {
+class GameScreen(
+    private val batch: Batch,
+    private val font: BitmapFont,
+    private val assets: AssetManager,
+    private val camera: OrthographicCamera,
+    private val engine: PooledEngine
+) : KtxScreen {
     // create bucket entity
     private val bucket = engine.entity {
         with<BucketComponent>()
@@ -47,8 +50,12 @@ class GameScreen(private val batch: Batch,
             bucket[TransformComponent.mapper]?.let { transform -> transform.bounds.x = touchPos.x - 64f / 2f }
         }
         when {
-            Gdx.input.isKeyPressed(Input.Keys.LEFT) -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = -200f }
-            Gdx.input.isKeyPressed(Input.Keys.RIGHT) -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = 200f }
+            Gdx.input.isKeyPressed(Input.Keys.LEFT) -> bucket[MoveComponent.mapper]?.let { move ->
+                move.speed.x = -200f
+            }
+            Gdx.input.isKeyPressed(Input.Keys.RIGHT) -> bucket[MoveComponent.mapper]?.let { move ->
+                move.speed.x = 200f
+            }
             else -> bucket[MoveComponent.mapper]?.let { move -> move.speed.x = 0f }
         }
 

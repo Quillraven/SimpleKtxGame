@@ -1,11 +1,9 @@
-apply plugin: "kotlin"
-
-sourceCompatibility = 1.6
-sourceSets.main.kotlin.srcDirs = [ "src/" ]
+sourceCompatibility = 1.7
+sourceSets.main.java.srcDirs = [ "src/" ]
 sourceSets.main.resources.srcDirs = ["../android/assets"]
 
 project.ext.mainClassName = "com.libktx.game.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../android/assets");
+project.ext.assetsDir = new File("../android/assets")
 
 dependencies {
     runtimeClasspath files("../core/build/classes/kotlin/main")
@@ -30,14 +28,15 @@ task debug(dependsOn: classes, type: JavaExec) {
 }
 
 task dist(type: Jar) {
-    from files(sourceSets.main.output.classesDirs)
-    from files(sourceSets.main.output.resourcesDir)
-    from {configurations.compile.collect {it.isDirectory() ? it : zipTree(it)}}
-    from files(project.assetsDir);
- 
     manifest {
         attributes 'Main-Class': project.mainClassName
     }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
 }
+
 
 dist.dependsOn classes
