@@ -16,6 +16,7 @@ import com.libktx.game.assets.get
 import ktx.app.KtxScreen
 import ktx.collections.iterate
 import ktx.graphics.use
+import ktx.log.debug
 import ktx.log.logger
 
 private val log = logger<GameScreen>()
