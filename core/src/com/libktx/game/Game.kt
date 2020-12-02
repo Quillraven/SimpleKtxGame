@@ -9,6 +9,7 @@ import ktx.app.KtxScreen
 
 class Game : KtxGame<KtxScreen>() {
     val batch by lazy { SpriteBatch() }
+
     // use LibGDX's default Arial font
     val font by lazy { BitmapFont() }
     val assets = AssetManager()
